@@ -18,11 +18,13 @@ type CartType = {
   email: string;
   cart?: any[];
   addToCart?: (product: Product) => void;
+  removeFromCart?:(product: Product) => void;
 };
 
 type CartContextType = {
   cartObj: CartType;
   addToCart?: (product: Product) => void;
+  removeFromCart?:(product: Product) => void;
 };
 
 export const CartContext = createContext<CartContextType>({
@@ -31,6 +33,7 @@ export const CartContext = createContext<CartContextType>({
     cart: [],
   },
   addToCart: (product: Product) => {},
+  removeFromCart:(product: Product) => {},
 });
 
 export const useCart = () => {
@@ -50,7 +53,14 @@ const CartProvider: React.FC<CartProviderProps> = ({
 
   const addToCart = (product: Product) => {
     const cart = cartObj.cart;
-
+    const productExists = cart.find(
+      (item: Product) => item.title === product.title
+    );
+    const a = productExists ? true : false;
+    if (a) {
+      window.alert("This product is already in the cart.");
+      return;
+    }
     cart.push(product);
 
     let index = null;
@@ -62,8 +72,27 @@ const CartProvider: React.FC<CartProviderProps> = ({
       Users[index].cart = cart;
     }
   };
+  const removeFromCart = (product: Product) => {
+    const cart = cartObj.cart;
+    const index = cart.findIndex((item: Product) => item.title === product.title);
+   
+    if (cart.some((item: Product) => item.title === product.title)) {
+      const index = cart.findIndex((item: Product) => item.title === product.title);
+      if (index !== -1) {
+        cart.splice(index, 1);
+      }
+    }
 
-  const contextValue = { cartObj, addToCart };
+    let userIndex = null;
+    Users.forEach((u, i) =>
+      u.email == cartObj.email ? (userIndex = i) : (userIndex = null)
+    );
+
+    if (userIndex != null) {
+      Users[userIndex].cart = cart;
+    }
+  };
+  const contextValue = { cartObj, addToCart,removeFromCart };
 
   return (
     <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>

@@ -1,5 +1,4 @@
-import React from "react";
-import { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import BasketIconActive from "../../assets/icons/BasketIconActive";
 import BasketIcon from "../../assets/icons/BasketIcon";
@@ -12,17 +11,28 @@ type Props = {
 
 const BasketBtn = ({ hasTitle, product }: Props) => {
   const [isActive, setIsActive] = useState(false);
-
   const cart = useCart();
+
+  useEffect(() => {
+    if (cart.cartObj.cart) {
+      setIsActive(
+        cart.cartObj.cart.some((item) => item.title === product.title)
+      );
+    }
+  }, [cart.cartObj.cart, product.title]);
 
   const handlePress = () => {
     setIsActive((prev) => !prev);
-    product.isInCart = !isActive;
-    if (cart && cart.addToCart) cart.addToCart(product);
+    const updatedProduct = { ...product, isInCart: !isActive };
+    if (!isActive) {
+      cart.addToCart && cart.addToCart(updatedProduct);
+    } else {
+      cart.removeFromCart && cart.removeFromCart(updatedProduct);
+    }
   };
 
   return (
-    <Pressable
+      <Pressable
       style={hasTitle === true ? styles.btn_big : styles.btn}
       onPress={handlePress}
     >
@@ -52,6 +62,7 @@ const BasketBtn = ({ hasTitle, product }: Props) => {
         </View>
       )}
     </Pressable>
+
   );
 };
 
