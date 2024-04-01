@@ -27,7 +27,7 @@ const AddressChange = ({ navigation }: Props) => {
 
   return (
     <KeyboardAvoidingView>
-      <View style={styles.container}>
+     <View style={styles.container}>
         <Title title="Street" />
         <InputField
           placeholder="Your street"
